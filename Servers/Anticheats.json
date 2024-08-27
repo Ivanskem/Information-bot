@@ -1,0 +1,219 @@
+{
+    "hycraft": {
+        "Title": "hycraft",
+        "Domain": "mc.hycraft.us",
+        "Anticheat": "Polar",
+        "Emoji": "<:customemoji:1277155111663308852>",
+        "Location": "United States, Los Angeles"
+    },
+    "pika-network": {
+        "Title": "pika-network",
+        "Domain": "play.pika-network.net",
+        "Anticheat": "Polar",
+        "Emoji": "<:customemoji:1277155699654393887>",
+        "Location": "Barbados, Christ Church"
+    },
+    "jartexnetwork": {
+        "Title": "jartexnetwork",
+        "Domain": "play.jartexnetwork.com",
+        "Anticheat": "Polar",
+        "Emoji": "<:customemoji:1277155613062987829>",
+        "Location": "France, Roubaix"
+    },
+    "gamster": {
+        "Title": "gamster",
+        "Domain": "gamster.org",
+        "Anticheat": "Polar (duels) / Intave + Matrix (Minigames)",
+        "Emoji": "<:customemoji:1277154984940798004>",
+        "Location": "Barbados, Christ Church"
+    },
+    "mineblaze": {
+        "Title": "mineblaze",
+        "Domain": "mineblaze.net",
+        "Anticheat": "Intave + Matrix (Only for bot)",
+        "Emoji": "<:customemoji:1277155560298381363>",
+        "Location": "Germany, Frankfurt am Main"
+    },
+    "cheatmine": {
+        "Title": "cheatmine",
+        "Domain": "cheatmine.net",
+        "Anticheat": "Intave + Matrix (Only for bot)",
+        "Emoji": "<:customemoji:1277154936760569927>",
+        "Location": "Germany, Frankfurt am Main"
+    },
+    "masedworld": {
+        "Title": "masedworld",
+        "Domain": "mc.masedworld.net",
+        "Anticheat": "Intave + Matrix (Only for bot)",
+        "Emoji": "<:customemoji:1277155045271666698>",
+        "Location": "Germany, Frankfurt am Main"
+    },
+    "dexland": {
+        "Title": "dexland",
+        "Domain": "dexland.org",
+        "Anticheat": "Intave + Matrix (Only for bot)",
+        "Emoji": "<:customemoji:1277154952740999270>",
+        "Location": "Germany, Frankfurt am Main"
+    },
+    "mineberry": {
+        "Title": "mineberry",
+        "Domain": "mc.mineberry.org",
+        "Anticheat": "Intave + Matrix (Only for bot)",
+        "Emoji": "<:customemoji:1277155147654496287>",
+        "Location": "Canada, Montreal"
+    },
+    "teslacraft": {
+        "Title": "teslacraft",
+        "Domain": "play.teslacraft.org",
+        "Anticheat": "Reflex (Bot checks disabled) + Matrix + Spartan + AACP",
+        "Emoji": "<:customemoji:1277155735029026899>",
+        "Location": "Germany, Limburg an der Lahn"
+    },
+    "MineLegacy": {
+        "Title": "MineLegacy",
+        "Domain": "Mlegacy.net",
+        "Anticheat": "Matrix + NCP",
+        "Emoji": "<:customemoji:1277155576111173662>",
+        "Location": "France, Gravelines"
+    },
+    "universocraft": {
+        "Title": "universocraft",
+        "Domain": "mc.universocraft.com",
+        "Anticheat": "Grim + Vulcan (Vulcan only for combat)",
+        "Emoji": "<:customemoji:1277155529185169480>",
+        "Location": "United States, Reston"
+    },
+    "hazelmc": {
+        "Title": "hazelmc",
+        "Domain": "hazelmc.com",
+        "Anticheat": "Vulcan",
+        "Emoji": "<:customemoji:1277155000610717708>",
+        "Location": "United States, Hamburg"
+    },
+    "ghostly": {
+        "Title": "ghostly",
+        "Domain": "ghostly.live",
+        "Anticheat": "Old-Vulcan (Strafe disabler not patched)",
+        "Emoji": "<:customemoji:1277154992389881898>",
+        "Location": "United States, Watson"
+    },
+    "minemalia": {
+        "Title": "minemalia",
+        "Domain": "play.minemalia.com",
+        "Anticheat": "Vulcan 1.12+",
+        "Emoji": "<:customemoji:1277155669149220924>",
+        "Location": "Germany, Frankfurt am Main"
+    },
+    "minelatino": {
+        "Title": "minelatino",
+        "Domain": "play.minelatino.com",
+        "Anticheat": "Vulcan",
+        "Emoji": "<:customemoji:1277155637238693963>",
+        "Location": "United States, Brownsville"
+    },
+    "minebox": {
+        "Title": "minebox",
+        "Domain": "mc.minebox.es",
+        "Anticheat": "Vulcan",
+        "Emoji": "<:customemoji:1277155178528641128>",
+        "Location": "United States, Miami"
+    },
+    "mineland": {
+        "Title": "mineland",
+        "Domain": "mc.mineland.net",
+        "Anticheat": "OLDIntave + Vulcan",
+        "Emoji": "<:customemoji:1277155204243918921>",
+        "Location": "France, Gravelines"
+    },
+    "supercraft": {
+        "Title": "supercraft",
+        "Domain": "mc.supercraft.fun",
+        "Anticheat": "Vulcan",
+        "Emoji": "<:customemoji:1277155381449326642>",
+        "Location": "France, Roubaix"
+    },
+    "esta": {
+        "Title": "esta",
+        "Domain": "esta.land",
+        "Anticheat": "Karhu + Vulcan",
+        "Emoji": "<:customemoji:1277154969044258836>",
+        "Location": "United States, Chicago"
+    },
+    "librecraft": {
+        "Title": "librecraft",
+        "Domain": "librecraft.com",
+        "Anticheat": "Verus + NCP (Another game maybe Matrix)",
+        "Emoji": "<:customemoji:1277155037138911272>",
+        "Location": "Canada, Beauharnois"
+    },
+    "sololegends": {
+        "Title": "sololegends",
+        "Domain": "sololegends.net",
+        "Anticheat": "Verus",
+        "Emoji": "<:customemoji:1277155766037647442>",
+        "Location": "United States, Ashburn"
+    },
+    "invadedlands": {
+        "Title": "invadedlands",
+        "Domain": "invadedlands.net",
+        "Anticheat": "Verus Custom",
+        "Emoji": "<:customemoji:1277155027609194518>",
+        "Location": "Canada, Beauharnois"
+    },
+    "coldpvp": {
+        "Title": "coldpvp",
+        "Domain": "coldpvp.com",
+        "Anticheat": "Verus Custom",
+        "Emoji": "<:customemoji:1277154945161887744>",
+        "Location": "Barbados, Christ Church"
+    },
+    "dynamicpvp": {
+        "Title": "dynamicpvp",
+        "Domain": "dynamicpvp.net",
+        "Anticheat": "Verus",
+        "Emoji": "<:customemoji:1277154960357982249>",
+        "Location": "Canada, Beauharnois"
+    },
+    "mclucky": {
+        "Title": "mclucky",
+        "Domain": "mclucky.net",
+        "Anticheat": "Not added (to file)",
+        "Emoji": "<:customemoji:1277930152755593339>",
+        "Location": "United States"
+    },
+    "zanncraft": {
+        "Title": "zanncraft",
+        "Domain": "zanncraft.ru",
+        "Anticheat": "Not added (to file)",
+        "Emoji": "<:customemoji:1277933943165030513>",
+        "Location": "Russia"
+    },
+    "funtime": {
+        "Title": "funtime",
+        "Domain": "funtime.su",
+        "Anticheat": "Spartan + Matrix + UNCP + Vulcan + Selfcoded",
+        "Emoji": "<:customemoji:1277154976527028300>",
+        "Location": "United States"
+    },
+    "reallyworld": {
+        "Title": "reallyworld",
+        "Domain": "mc.reallyworld.ru",
+        "Anticheat": "Grim",
+        "Emoji": "<:customemoji:1277929669546606615>",
+        "Location": "Germany"
+    },
+    "holyworld": {
+        "Title": "holyworld",
+        "Domain": "mc.holyworld.me",
+        "Anticheat": "Grim selfcoded",
+        "Emoji": "<:customemoji:1277934135662612534>",
+        "Location": "United States"
+    },
+    "ggmine": {
+        "Title": "ggmine",
+        "Domain": "mr.ggmine.ru",
+        "Anticheat": "Not added (to file)",
+        "Emoji": "<:customemoji:1277936985205375057>",
+        "Location": "Russia"
+    }
+}
