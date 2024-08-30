@@ -85,7 +85,7 @@ def add_emoji(emoji_name, base64_image):
             return "Emoji already exist", None
         else:
             data = {
-                "name": emoji_name,
+                "name": emoji_name.replace("-", "_"),
                 "image": f"data:image/png;base64,{base64_image}"
             }
 
@@ -166,8 +166,8 @@ async def serverinfo(interaction: Interaction,
     channel = interaction.channel
     channel_response = interaction.response
     anticheats = anticheat_read()
-    request = requests.get(f'https://api.mcstatus.io/v2/status/java/{server.lower()}')
     await channel_response.send_message('Wait for the bot to collect the information and send it to you', ephemeral=True)
+    request = requests.get(f'https://api.mcstatus.io/v2/status/java/{server.lower()}')
     embed = nextcord.Embed(title=f'Information about {server}',
                            color=nextcord.Color.dark_grey())
     try:
@@ -180,7 +180,7 @@ async def serverinfo(interaction: Interaction,
         embed.add_field(name="Error",
                         value=f"Something went wrong. Maybe you typed wrong ip or there is an error with the json file. {e}")
         await channel.send(embed=embed)
-    if data["online"] is True:
+    if data["online"] is True and location["status"] == 'success':
         embed.add_field(name='Status: ', value='Active')
         embed.add_field(name='Domain: ', value=data["host"])
         embed.add_field(name='Ip address: ', value=f'{data["ip_address"]}\n({location["country"]},\n{location["city"]})')
@@ -223,12 +223,24 @@ async def serverinfo(interaction: Interaction,
             await channel.send(embed=embed, file=file)
         except nextcord.errors.NotFound:
             await channel.send(f'Something went wrong, try again please')
-    else:
-        embed.add_field(name="Status: ", value="Currently server offline or invalid domain wrote")
+        except UnboundLocalError:
+            await channel.send(embed=embed)
+    elif location["status"] == 'success':
+        print(location)
+        print(data)
+        embed.add_field(name="Status: ", value=f"Currently server offline\n"
+                                               f'Ip: {data["ip_address"]}\n({location["country"]},\n{location["city"]})\n')
         try:
             await channel.send(embed=embed)
         except nextcord.errors.NotFound:
             await channel.send(f'Something went wrong, try again please')
+    else:
+        embed.add_field(name="Status: ", value="invalid domain wrote")
+        try:
+            await channel.send(embed=embed)
+        except nextcord.errors.NotFound:
+            await channel.send(f'Something went wrong, try again please')
+
 
 
 @client_discord.slash_command(name='server-info', description='Displays information about server or IP')
@@ -297,14 +309,14 @@ async def serverinfo_list(interaction: Interaction):
     if data is None:
         return
     await interaction.response.send_message('Wait for the bot to collect the information and send it to you', ephemeral=True)
-
+    await client_discord.change_presence(status=nextcord.Status.do_not_disturb)
     servers = list(data.keys())
     chunk_size = 25
     chunks = [servers[i:i + chunk_size] for i in range(0, len(servers), chunk_size)]
 
     for chunk in chunks:
         embed = nextcord.Embed(title='Servers list', color=nextcord.Color.dark_grey())
-
+        embed.set_footer(text=f"Requested by: {user.name}\n", icon_url=user.avatar.url)
         for server_name in chunk:
             server = data[server_name]
 
@@ -345,6 +357,7 @@ async def serverinfo_list(interaction: Interaction):
         await channel.send(embed=embed)
         await asyncio.sleep(1)
 
-    # Добавляем информацию о запросе в подвал Embed
-    embed.set_footer(text=f"Requested by: {user.name}\n", icon_url=user.avatar.url)
+    await client_discord.change_presence(status=nextcord.Status.online)
+
+
 client_discord.run(TOKEN)
