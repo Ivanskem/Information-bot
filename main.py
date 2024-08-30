@@ -22,11 +22,21 @@ intents.bans = True
 intents.moderation = True
 
 client_discord = nextcord.Client(intents=intents)
-
-with open('settings.json', 'r') as file:
-    data = json.load(file)
-    TOKEN = data["Token"]
-    whois_api_key = data["Whois"]
+try:
+    with open('settings.json', 'r') as file:
+        try:
+            data = json.load(file)
+            TOKEN = data["TOKEN"]
+            whois_api_key = data["WHOIS"]
+        except json.JSONDecodeError as e:
+            print(f"Error while decoding: {e}")
+except FileNotFoundError:
+    with open('settings.json', 'w') as file:
+        settings = {
+            "TOKEN": "Enter your discord bot token",
+            "WHOIS": "Enter you WHOIS api key"
+        }
+        json.dump(settings, file, indent=4)
 
 
 def save_icon(image_base64, filename):
@@ -359,5 +369,7 @@ async def serverinfo_list(interaction: Interaction):
 
     await client_discord.change_presence(status=nextcord.Status.online)
 
-
-client_discord.run(TOKEN)
+try:
+    client_discord.run(TOKEN)
+except NameError:
+    print(f'Please open "settings.json" and enter TOKEN AND WHOIS parameters')
