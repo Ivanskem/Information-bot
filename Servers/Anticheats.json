@@ -215,5 +215,166 @@
         "Anticheat": "Not added (to file)",
         "Emoji": "<:customemoji:1277936985205375057>",
         "Location": "Russia"
+    },
+    "topbars": {
+        "Title": "topbars",
+        "Domain": "topbars.net",
+        "Anticheat": "Not added (to file)",
+        "Emoji": "<:customemoji:1277971997732634669>",
+        "Location": "United States"
+    },
+    "scrims": {
+        "Title": "scrims",
+        "Domain": "scrims.network",
+        "Anticheat": "Not added (to file)",
+        "Emoji": "<:customemoji:1277974123125018718>",
+        "Location": "Canada"
+    },
+    "zonecraft": {
+        "Title": "zonecraft",
+        "Domain": "zonecraft.es",
+        "Anticheat": "Morgan + Grim",
+        "Emoji": "<:customemoji:1277974172030734349>",
+        "Location": "United States"
+    },
+    "blockdrop": {
+        "Title": "blockdrop",
+        "Domain": "mc.blockdrop.org",
+        "Anticheat": "Not added (to file)",
+        "Emoji": "<:customemoji:1277974275747479614>",
+        "Location": "Canada"
+    },
+    "cubecraft": {
+        "Title": "cubecraft",
+        "Domain": "cubecraft.net",
+        "Anticheat": "Sentinel",
+        "Emoji": "<:customemoji:1277974331313623091>",
+        "Location": "United States"
+    },
+    "minemen": {
+        "Title": "minemen",
+        "Domain": "minemen.club",
+        "Anticheat": "AGC",
+        "Emoji": "<:customemoji:1277975553571557470>",
+        "Location": "Canada"
+    },
+    "astralmc": {
+        "Title": "astralmc",
+        "Domain": "astralmc.cc",
+        "Anticheat": "Sparky",
+        "Emoji": "<:customemoji:1277975738678513728>",
+        "Location": "United States"
+    },
+    "hylex": {
+        "Title": "hylex",
+        "Domain": "hylex.gg",
+        "Anticheat": "Grim",
+        "Emoji": "<:customemoji:1277155008777027595>",
+        "Location": "Brazil"
+    },
+    "sagepvp": {
+        "Title": "sagepvp",
+        "Domain": "sagepvp.org",
+        "Anticheat": "Not added (to file)",
+        "Emoji": "<:customemoji:1277975837932785768>",
+        "Location": "Canada"
+    },
+    "blocksmc": {
+        "Title": "blocksmc",
+        "Domain": "blocksmc.com",
+        "Anticheat": "Verus (custom) + UNCP",
+        "Emoji": "<:customemoji:1277977036194840577>",
+        "Location": "United States"
+    },
+    "ecuacraft": {
+        "Title": "ecuacraft",
+        "Domain": "mc.ecuacraft.com",
+        "Anticheat": "Not added (to file)",
+        "Emoji": "<:customemoji:1277977122874327051>",
+        "Location": "United States"
+    },
+    "bedwarspractice": {
+        "Title": "bedwarspractice",
+        "Domain": "bedwarspractice.club",
+        "Anticheat": "Not added (to file)",
+        "Emoji": "<:customemoji:1279012479602655244>",
+        "Location": "United States"
+    },
+    "luckymc": {
+        "Title": "luckymc",
+        "Domain": "luckymc.ru",
+        "Anticheat": "Not added (to file)",
+        "Emoji": "<:customemoji:1279018244849664050>",
+        "Location": "United States"
+    },
+    "mccisland": {
+        "Title": "mccisland",
+        "Domain": "play.mccisland.net",
+        "Anticheat": "Not added (to file)",
+        "Emoji": "<:customemoji:1279018640938897429>",
+        "Location": "Barbados"
+    },
+    "purple": {
+        "Title": "purple",
+        "Domain": "purple.wtf",
+        "Anticheat": "Not added (to file)",
+        "Emoji": "<:customemoji:1279027732058996808>",
+        "Location": "United States"
+    },
+    "hoplite": {
+        "Title": "hoplite",
+        "Domain": "hoplite.gg",
+        "Anticheat": "Not added (to file)",
+        "Emoji": "<:customemoji:1279027788715921440>",
+        "Location": "Canada"
+    },
+    "lifestealsmp": {
+        "Title": "lifestealsmp",
+        "Domain": "lifestealsmp.com",
+        "Anticheat": "Not added (to file)",
+        "Emoji": "<:customemoji:1279027844365815809>",
+        "Location": "United Kingdom"
+    },
+    "sunrealms": {
+        "Title": "sunrealms",
+        "Domain": "vote.sunrealms.net",
+        "Anticheat": "Not added (to file)",
+        "Emoji": "<:customemoji:1279027898761744404>",
+        "Location": "United States"
+    },
+    "akumamc": {
+        "Title": "akumamc",
+        "Domain": "akumamc.net",
+        "Anticheat": "Not added (to file)",
+        "Emoji": "<:customemoji:1279028108984324117>",
+        "Location": "Barbados"
+    },
+    "aternos": {
+        "Title": "aternos",
+        "Domain": "unt1tledmc.aternos.me",
+        "Anticheat": "Not added (to file)",
+        "Emoji": "<:customemoji:1279028479882559535>",
+        "Location": "Germany"
+    },
+    "og-network": {
+        "Title": "og-network",
+        "Domain": "og-network.net",
+        "Anticheat": "Not added (to file)",
+        "Emoji": "<:customemoji:1279029985595756606>",
+        "Location": "France"
+    },
+    "vanillaeuropa": {
+        "Title": "vanillaeuropa",
+        "Domain": "mso.vanillaeuropa.com",
+        "Anticheat": "Not added (to file)",
+        "Emoji": "<:customemoji:1279030745448583171>",
+        "Location": "Germany"
+    },
+    "shield": {
+        "Title": "shield",
+        "Domain": "sub.shield.land",
+        "Anticheat": "Not added (to file)",
+        "Emoji": "<:customemoji:1279030966647787520>",
+        "Location": "Canada"
     }
 }
