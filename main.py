@@ -14,6 +14,7 @@ import asyncio
 import time
 import aiohttp
 import aiofiles
+import cloudscraper
 
 intents = nextcord.Intents.default()
 intents.invites = True
@@ -50,9 +51,9 @@ async def save_icon(image_base64, filename):
     return file_path
 
 
-async def save_favicon(favicon_data, filename):
+async def save_favicon(favicon_data, filename, file_extension):
     os.makedirs("icons", exist_ok=True)
-    file_path = os.path.join("icons", f"{filename}.png")
+    file_path = os.path.join("icons", f"{filename}{file_extension}")
     async with aiofiles.open(file_path, "wb") as file:
         await file.write(favicon_data.getvalue())
     return file_path
@@ -165,33 +166,33 @@ async def server_and_ip_info(domain):
 
 
 async def get_favicon(domain):
-    favicon_url = f"https://{domain}/favicon.ico"
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(favicon_url) as response:
-                if response.status == 200:
-                    favicon_base64 = base64.b64encode(await response.read()).decode('utf-8')
-                    print('Favicon.ico found, sending')
-                    return favicon_base64
-                else:
-                    print(f'Error while searching favicon.ico')
-    except Exception as e:
-        print(f'Error while getting favicon.ico: {e}')
-        return None
+    scraper = cloudscraper.create_scraper()  # Создаем scraper, который обходит Cloudflare
+    favicon_url_ico = f"https://{domain}/favicon.ico"
+    favicon_url_png = f"https://{domain}/favicon.png"
 
     try:
-        favicon_url = f"https://{domain}/favicon.png"
-        async with aiohttp.ClientSession() as session:
-            async with session.get(favicon_url) as response:
-                if response.status == 200:
-                    favicon_base64 = base64.b64encode(await response.read()).decode('utf-8')
-                    print('Favicon.png found, sending')
-                    return favicon_base64
-                else:
-                    print(f'Error while searching favicon.png')
+        response = scraper.get(favicon_url_ico)
+        if response.status_code == 200:
+            print(f'Size of favicon.ico: {len(response.content)} bytes')
+            favicon_base64 = base64.b64encode(response.content).decode('utf-8')
+            print('Favicon.ico found, sending')
+            return favicon_base64
+        else:
+            print('Error while searching favicon.ico')
+    except Exception as e:
+        print(f'Error while getting favicon.ico: {e}')
+
+    try:
+        response = scraper.get(favicon_url_png)
+        if response.status_code == 200:
+            print(f'Size of favicon.png: {len(response.content)} bytes')
+            favicon_base64 = base64.b64encode(response.content).decode('utf-8')
+            print('Favicon.png found, sending')
+            return favicon_base64
+        else:
+            print('Error while searching favicon.png')
     except Exception as e:
         print(f'Error while getting favicon.png: {e}')
-        return None
 
     return None
 
@@ -292,21 +293,25 @@ async def serverinfo(interaction: Interaction,
                                                            ' e.g., server.com, 1.1.1.1')):
     channel = interaction.channel
     channel_response = interaction.response
-    await channel_response.send_message(f'Wait for the bot to collect the information and send it to you', ephemeral=True)
+    await channel_response.send_message('Wait for the bot to collect the information and send it to you',
+                                        ephemeral=True)
+
     data = await server_and_ip_info(server)
 
-    embed = nextcord.Embed(title=f'Information about {server}',
-                           color=nextcord.Color.dark_grey())
+    embed = nextcord.Embed(title=f'Information about {server}', color=nextcord.Color.dark_grey())
     embed.set_footer(text=f'Requested by: {interaction.user.name}', icon_url=interaction.user.avatar.url)
 
     favicon_base64 = await get_favicon(server.lower())
     if favicon_base64:
         try:
             favicon_data = BytesIO(base64.b64decode(favicon_base64))
-            file_path = await save_favicon(favicon_data, server)
+            file_extension = ".png" if ".png" in favicon_base64 else ".ico"
+
+            file_path = await save_favicon(favicon_data, server.lower(), file_extension)
+
             if os.path.exists(file_path):
-                file = nextcord.File(file_path, filename="favicon.png")
-                embed.set_thumbnail(url="attachment://favicon.png")
+                file = nextcord.File(file_path, filename=f"favicon{file_extension}")
+                embed.set_thumbnail(url=f"attachment://favicon{file_extension}")
             else:
                 print(f"Favicon file not found at path: {file_path}")
                 file = None
@@ -316,29 +321,29 @@ async def serverinfo(interaction: Interaction,
     else:
         file = None
 
-    embed.add_field(name='Domain: ', value=data.get("domainName", 'Domain not found'))
-    embed.add_field(name='Registered service: ', value=data.get("registrarName", 'Registrar not found'))
-    embed.add_field(name='IP addresses: ',
+    embed.add_field(name='Domain:', value=data.get("domainName", 'Domain not found'))
+    embed.add_field(name='Registered service:', value=data.get("registrarName", 'Registrar not found'))
+    embed.add_field(name='IP addresses:',
                     value=', '.join(
                         data.get("registryData", {}).get("nameServers", {}).get("ips", [])) or 'No IP addresses found')
-    embed.add_field(name='Status: ', value=data.get("registryData", {}).get("status", 'Status not found'))
+    embed.add_field(name='Status:', value=data.get("registryData", {}).get("status", 'Status not found'))
 
     registrant = data.get("registryData", {}).get("registrant", {})
-    embed.add_field(name='Registered by (name): ', value=registrant.get("name", 'Registrant name not found'))
-    embed.add_field(name='Registered by (email): ', value=registrant.get("email", 'Registrant email not found'))
+    embed.add_field(name='Registered by (name):', value=registrant.get("name", 'Registrant name not found'))
+    embed.add_field(name='Registered by (email):', value=registrant.get("email", 'Registrant email not found'))
 
     created_date = data.get("registryData", {}).get("createdDate", "")
     expires_date = data.get("registryData", {}).get("expiresDate", "")
 
-    embed.add_field(name='Registered at: ',
+    embed.add_field(name='Registered at:',
                     value=(f'<t:{int(datetime.fromisoformat(created_date.replace("Z", "+00:00")).timestamp())}:F>'
                            if created_date else 'Registration date not found'))
-    embed.add_field(name='Expires at: ',
+    embed.add_field(name='Expires at:',
                     value=(f'<t:{int(datetime.fromisoformat(expires_date.replace("Z", "+00:00")).timestamp())}:F>'
                            if expires_date else 'Expiration date not found'))
 
     try:
-        if file:
+        if file is not None:
             await channel.send(embed=embed, file=file)
         else:
             await channel.send(embed=embed)
@@ -380,11 +385,15 @@ async def serverinfo_list(interaction: Interaction):
                     print(f'Error: {e}')
                     continue
                 await asyncio.sleep(0.5)
-                country = location["country"]
                 try:
-                    country_emoji = await location_emoji()
+                    country = location["country"]
                 except json.JSONDecodeError:
                     country = "Other"
+                except KeyError:
+                    country = "Other"
+
+                country_emoji = await location_emoji()
+
                 if 'players' in data_server and location["status"] == 'success':
                     server_info = (
                         f'Anticheat: {server["Anticheat"]}\n'
@@ -407,9 +416,17 @@ async def serverinfo_list(interaction: Interaction):
                         f'Online: Server currently offline'
                     )
 
-                embed.add_field(name=f'{server["Emoji"]} {server["Title"]} {country_emoji[country]["Emoji"]}\n ({server["Domain"]})', value=server_info, inline=True)
+                # Используем метод .get() для безопасного доступа к эмодзи страны
+                # Если страны нет в словаре, подставляем эмодзи для "Other"
+                country_flag_emoji = country_emoji.get(country, country_emoji["Other"])["Emoji"]
 
+                embed.add_field(
+                    name=f'{server["Emoji"]} {server["Title"]} {country_flag_emoji}\n ({server["Domain"]})',
+                    value=server_info,
+                    inline=True
+                )
             await channel.send(embed=embed)
+            print(f'Successfully sent embed message!')
             await asyncio.sleep(1)
         send_time = time.monotonic()
         print(f'Takes: {send_time-response_time:.2f}s')

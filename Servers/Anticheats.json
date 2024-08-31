@@ -376,5 +376,40 @@
         "Anticheat": "Not added (to file)",
         "Emoji": "<:customemoji:1279030966647787520>",
         "Location": "Canada"
+    },
+    "mc-complex": {
+        "Title": "mc-complex",
+        "Domain": "bmc.mc-complex.com",
+        "Anticheat": "Not added (to file)",
+        "Emoji": "<:customemoji:1279456595171872904>",
+        "Location": "Canada"
+    },
+    "fadecloud": {
+        "Title": "fadecloud",
+        "Domain": "best.fadecloud.com",
+        "Anticheat": "Not added (to file)",
+        "Emoji": "<:customemoji:1279457249915310090>",
+        "Location": "United States"
+    },
+    "blossomcraft": {
+        "Title": "blossomcraft",
+        "Domain": "best.blossomcraft.org",
+        "Anticheat": "Not added (to file)",
+        "Emoji": "<:customemoji:1279457346581565450>",
+        "Location": "United States"
+    },
+    "ourcraftg": {
+        "Title": "ourcraftg",
+        "Domain": "play.ourcraftg.xyz",
+        "Anticheat": "Not added (to file)",
+        "Emoji": "<:customemoji:1279458448551186543>",
+        "Location": "Germany"
+    },
+    "valhallasmp": {
+        "Title": "valhallasmp",
+        "Domain": "play.valhallasmp.xyz",
+        "Anticheat": "Not added (to file)",
+        "Emoji": "<:customemoji:1279458500845506560>",
+        "Location": "Bulgaria"
     }
 }
