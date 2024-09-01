@@ -31,8 +31,9 @@ try:
     with open('settings.json', 'r') as file:
         try:
             data = json.load(file)
-            TOKEN = data["TOKEN"]
-            whois_api_key = data["WHOIS"]
+            TOKEN = data["Token"]
+            whois_api_key = data["Whois"]
+            support = data["Support"]
         except json.JSONDecodeError as e:
             print(f"Error while decoding: {e}")
 except FileNotFoundError:
@@ -202,7 +203,73 @@ async def get_favicon(domain):
 async def on_ready():
     print(f'Logged as {client_discord.user}')
 
+#Other, Another
+@client_discord.slash_command(name='server-info', description='Displays information about server or IP')
+async def serverinfo(interaction: Interaction,
+                     server: str = SlashOption(name='ip',
+                                               description='Please enter the full server domain or IP,'
+                                                           ' e.g., server.com, 1.1.1.1')):
+    channel = interaction.channel
+    channel_response = interaction.response
+    await channel_response.send_message('Wait for the bot to collect the information and send it to you',
+                                        ephemeral=True)
 
+    data = await server_and_ip_info(server)
+
+    embed = nextcord.Embed(title=f'Information about {server}', color=nextcord.Color.dark_grey())
+    embed.set_footer(text=f'Requested by: {interaction.user.name}', icon_url=interaction.user.avatar.url)
+
+    favicon_base64 = await get_favicon(server.lower())
+    if favicon_base64:
+        try:
+            favicon_data = BytesIO(base64.b64decode(favicon_base64))
+            file_extension = ".png" if ".png" in favicon_base64 else ".ico"
+
+            file_path = await save_favicon(favicon_data, server.lower(), file_extension)
+
+            if os.path.exists(file_path):
+                file = nextcord.File(file_path, filename=f"favicon{file_extension}")
+                embed.set_thumbnail(url=f"attachment://favicon{file_extension}")
+            else:
+                print(f"Favicon file not found at path: {file_path}")
+                file = None
+        except Exception as e:
+            print(f"Failed to decode base64 or create file: {e}")
+            file = None
+    else:
+        file = None
+
+    embed.add_field(name='Domain:', value=data.get("domainName", 'Domain not found'))
+    embed.add_field(name='Registered service:', value=data.get("registrarName", 'Registrar not found'))
+    embed.add_field(name='IP addresses:',
+                    value=', '.join(
+                        data.get("registryData", {}).get("nameServers", {}).get("ips", [])) or 'No IP addresses found')
+    embed.add_field(name='Status:', value=data.get("registryData", {}).get("status", 'Status not found'))
+
+    registrant = data.get("registryData", {}).get("registrant", {})
+    embed.add_field(name='Registered by (name):', value=registrant.get("name", 'Registrant name not found'))
+    embed.add_field(name='Registered by (email):', value=registrant.get("email", 'Registrant email not found'))
+
+    created_date = data.get("registryData", {}).get("createdDate", "")
+    expires_date = data.get("registryData", {}).get("expiresDate", "")
+
+    embed.add_field(name='Registered at:',
+                    value=(f'<t:{int(datetime.fromisoformat(created_date.replace("Z", "+00:00")).timestamp())}:F>'
+                           if created_date else 'Registration date not found'))
+    embed.add_field(name='Expires at:',
+                    value=(f'<t:{int(datetime.fromisoformat(expires_date.replace("Z", "+00:00")).timestamp())}:F>'
+                           if expires_date else 'Expiration date not found'))
+
+    try:
+        if file is not None:
+            await channel.send(embed=embed, file=file)
+        else:
+            await channel.send(embed=embed)
+    except nextcord.errors.NotFound:
+        await channel_response.send_message('Something went wrong, try again please', ephemeral=True)
+
+
+# Minecraft, Mojang AB
 @client_discord.slash_command(name='minecraft-server-info', description='displays information about minecraft server')
 async def serverinfo(interaction: Interaction,
                      server: str = SlashOption(name='ip',
@@ -287,69 +354,30 @@ async def serverinfo(interaction: Interaction,
             await channel.send(f'Something went wrong, try again please')
 
 
-@client_discord.slash_command(name='server-info', description='Displays information about server or IP')
-async def serverinfo(interaction: Interaction,
-                     server: str = SlashOption(name='ip',
-                                               description='Please enter the full server domain or IP,'
-                                                           ' e.g., server.com, 1.1.1.1')):
-    channel = interaction.channel
-    channel_response = interaction.response
-    await channel_response.send_message('Wait for the bot to collect the information and send it to you',
-                                        ephemeral=True)
+@client_discord.slash_command(name='minecraft-server-anticheat', description='You can write server anticheat if you have information')
+async def server_anticheat(interaction: Interaction,
+                           server: str = SlashOption(name='server_name',
+                                                     description='Please enter the domain of the server you want to change anticheat info'),
+                           new_anticheat: str = SlashOption(name='anticheat',
+                                                            description='Please enter new anticheat name')):
+    servers = await anticheat_read()
 
-    data = await server_and_ip_info(server)
-
-    embed = nextcord.Embed(title=f'Information about {server}', color=nextcord.Color.dark_grey())
-    embed.set_footer(text=f'Requested by: {interaction.user.name}', icon_url=interaction.user.avatar.url)
-
-    favicon_base64 = await get_favicon(server.lower())
-    if favicon_base64:
-        try:
-            favicon_data = BytesIO(base64.b64decode(favicon_base64))
-            file_extension = ".png" if ".png" in favicon_base64 else ".ico"
-
-            file_path = await save_favicon(favicon_data, server.lower(), file_extension)
-
-            if os.path.exists(file_path):
-                file = nextcord.File(file_path, filename=f"favicon{file_extension}")
-                embed.set_thumbnail(url=f"attachment://favicon{file_extension}")
+    if cut_domain(server) in servers:
+        old_anticheat = servers[cut_domain(server)]["Anticheat"]
+        if old_anticheat == 'Not added (to file)':
+            servers[cut_domain(server)]["Anticheat"] = new_anticheat
+            async with aiofiles.open('Servers/Anticheats.json', 'w', encoding='utf-8') as f:
+                await f.write(json.dumps(servers, ensure_ascii=False, indent=4))
+            if servers[cut_domain(server)]["Anticheat"] == new_anticheat:
+                await interaction.response.send_message(f'Successfully. Anticheat of server {server} updated from {old_anticheat} to {new_anticheat}', ephemeral=True)
             else:
-                print(f"Favicon file not found at path: {file_path}")
-                file = None
-        except Exception as e:
-            print(f"Failed to decode base64 or create file: {e}")
-            file = None
-    else:
-        file = None
-
-    embed.add_field(name='Domain:', value=data.get("domainName", 'Domain not found'))
-    embed.add_field(name='Registered service:', value=data.get("registrarName", 'Registrar not found'))
-    embed.add_field(name='IP addresses:',
-                    value=', '.join(
-                        data.get("registryData", {}).get("nameServers", {}).get("ips", [])) or 'No IP addresses found')
-    embed.add_field(name='Status:', value=data.get("registryData", {}).get("status", 'Status not found'))
-
-    registrant = data.get("registryData", {}).get("registrant", {})
-    embed.add_field(name='Registered by (name):', value=registrant.get("name", 'Registrant name not found'))
-    embed.add_field(name='Registered by (email):', value=registrant.get("email", 'Registrant email not found'))
-
-    created_date = data.get("registryData", {}).get("createdDate", "")
-    expires_date = data.get("registryData", {}).get("expiresDate", "")
-
-    embed.add_field(name='Registered at:',
-                    value=(f'<t:{int(datetime.fromisoformat(created_date.replace("Z", "+00:00")).timestamp())}:F>'
-                           if created_date else 'Registration date not found'))
-    embed.add_field(name='Expires at:',
-                    value=(f'<t:{int(datetime.fromisoformat(expires_date.replace("Z", "+00:00")).timestamp())}:F>'
-                           if expires_date else 'Expiration date not found'))
-
-    try:
-        if file is not None:
-            await channel.send(embed=embed, file=file)
+                await interaction.response.send_message(f'Something went wrong, please try again later', ephemeral=True)
         else:
-            await channel.send(embed=embed)
-    except nextcord.errors.NotFound:
-        await channel_response.send_message('Something went wrong, try again please', ephemeral=True)
+            await interaction.response.send_message(
+                f'Anticheat already set, if you have another anticheat information please type to <@{support}>',
+                ephemeral=True)
+    else:
+        await interaction.response.send_message(f'Server not found in list, please try again', ephemeral=True)
 
 
 @client_discord.slash_command(name='minecraft-servers', description='Displays list of servers and their anticheats')
@@ -432,6 +460,7 @@ async def serverinfo_list(interaction: Interaction):
         await client_discord.change_presence(status=nextcord.Status.online)
 
 
+# Counter Strike, Valve
 @client_discord.slash_command(name='counter-strike-serverinfo', description='Displays information about counter-strike servers')
 async def serverinfo(interaction: Interaction,
                      server: str = SlashOption(name='ip',
