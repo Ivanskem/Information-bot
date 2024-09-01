@@ -15,6 +15,7 @@ import time
 import aiohttp
 import aiofiles
 import cloudscraper
+import valve.source.a2s
 
 intents = nextcord.Intents.default()
 intents.invites = True
@@ -416,8 +417,6 @@ async def serverinfo_list(interaction: Interaction):
                         f'Online: Server currently offline'
                     )
 
-                # Используем метод .get() для безопасного доступа к эмодзи страны
-                # Если страны нет в словаре, подставляем эмодзи для "Other"
                 country_flag_emoji = country_emoji.get(country, country_emoji["Other"])["Emoji"]
 
                 embed.add_field(
@@ -432,6 +431,44 @@ async def serverinfo_list(interaction: Interaction):
         print(f'Takes: {send_time-response_time:.2f}s')
         await client_discord.change_presence(status=nextcord.Status.online)
 
+
+@client_discord.slash_command(name='counter-strike-serverinfo', description='Displays information about counter-strike servers')
+async def serverinfo(interaction: Interaction,
+                     server: str = SlashOption(name='ip',
+                                               description='Enter server ip'),
+                     port: int = SlashOption(name='port',
+                                             description='Enter server port')):
+    channel = interaction.channel
+    server_address = (server, port)
+    await interaction.response.send_message('Wait for the bot to collect the information and send it to you', ephemeral=True)
+    with valve.source.a2s.ServerQuerier(server_address) as host:
+        try:
+            info = host.info()
+            players = host.players()
+        except Exception:
+            await interaction.followup.send(f"Server can't send correct response message!", ephemeral=True)
+        print(info.__dict__)
+        print(players.__dict__)
+        player = [f'{player["name"]} {player["score"]} ({player["duration"]/60:.1f} min)' for player in players["players"]]
+        embed = nextcord.Embed(title='Information about counter-strike server',
+                               color=nextcord.Color.dark_grey())
+        embed.add_field(name='Main info: ',
+                        value='Name: {server_name}\n'
+                              'Map: {map}\n'
+                              'Players: {player_count}/{max_players}'.format(**info))
+        embed.add_field(name='Version: ',
+                        value='Game: {game}\n'
+                              'Version: {version}\n'
+                              'App: {app_id}'.format(**info))
+        if info["vac_enabled"] == 1:
+            embed.add_field(name='Other: ',
+                            value='Vac: Enabled')
+        else:
+            embed.add_field(name='Other: ',
+                            value='Vac: Disabled')
+        embed.add_field(name='Players list: ',
+                        value=f'\n'.join(player))
+        await channel.send(embed=embed)
 try:
     client_discord.run(TOKEN)
 except NameError:
