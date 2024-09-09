@@ -27,13 +27,51 @@ intents.moderation = True
 
 client_discord = nextcord.Client(intents=intents)
 
+disconnect_count = 0
+
+if not os.path.exists('Temp') and os.path.isdir('Temp'):
+    os.mkdir('Temp')
+
+try:
+    with open('Temp/settings.json', 'r', encoding='utf-8') as file:
+        pass
+except FileNotFoundError:
+    with open('Temp/settings.json', 'w', encoding='utf-8') as file:
+        new_json = {}
+        json.dump(new_json, ensure_ascii=False, indent=4)
+
+if not os.path.exists('Servers') and os.path.isdir('Servers'):
+    os.mkdir('Servers')
+
+try:
+    with open('Servers/Anticheats.json', 'r', encoding='utf-8') as file:
+        pass
+except FileNotFoundError:
+    with open('Servers/Anticheats.json', 'w', encoding='utf-8') as file:
+        new_json = {}
+        json.dump(new_json, ensure_ascii=False, indent=4)
+
+try:
+    with open('Servers/Location.json', 'r', encoding='utf-8') as file:
+        pass
+except FileNotFoundError:
+    with open('Servers/Location.json', 'w', encoding='utf-8') as file:
+        new_json = {}
+        json.dump(new_json, ensure_ascii=False, indent=4)
+
+if not os.path.exists('images') and os.path.isdir('images'):
+    os.mkdir('images')
+
+if not os.path.exists('icons') and os.path.isdir('icons'):
+    os.mkdir('icons')
+
 try:
     with open('settings.json', 'r') as file:
         try:
             data = json.load(file)
             TOKEN = data["Token"]
             whois_api_key = data["Whois"]
-            support = data["Support"]
+            support = int(data["Support"])
         except json.JSONDecodeError as e:
             print(f"Error while decoding: {e}")
 except FileNotFoundError:
@@ -75,6 +113,18 @@ async def anticheat_read():
     else:
         print(f"File not found: {file_path}")
         return None
+
+
+async def change_anticheat(server, servers, new_anticheat, old_anticheat, interaction):
+    servers[cut_domain(server)]["Anticheat"] = new_anticheat
+    async with aiofiles.open('Servers/Anticheats.json', 'w', encoding='utf-8') as f:
+        await f.write(json.dumps(servers, ensure_ascii=False, indent=4))
+    if servers[cut_domain(server)]["Anticheat"] == new_anticheat:
+        await interaction.response.send_message(
+            f'Successfully. Anticheat of server {server} updated from {old_anticheat} to {new_anticheat}',
+            ephemeral=True)
+    else:
+        await interaction.response.send_message(f'Something went wrong, please try again later', ephemeral=True)
 
 
 async def location_emoji():
@@ -198,12 +248,21 @@ async def get_favicon(domain):
 
     return None
 
+# Discord client events
+
 
 @client_discord.event
 async def on_ready():
     print(f'Logged as {client_discord.user}')
 
-#Other, Another
+
+@client_discord.event
+async def on_disconnect():
+    disconnect_count += 1
+    print(f'Bot disconnected, restarting ({disconnect_count})')
+# Other, Another
+
+
 @client_discord.slash_command(name='server-info', description='Displays information about server or IP')
 async def serverinfo(interaction: Interaction,
                      server: str = SlashOption(name='ip',
@@ -275,6 +334,7 @@ async def serverinfo(interaction: Interaction,
                      server: str = SlashOption(name='ip',
                                                description='Please enter the full Minecraft server domain,'
                                                            ' e.g., play.server.com')):
+    print(f'User: {interaction.user} requested information about {server} server')
     domain = cut_domain(server.lower())
     channel = interaction.channel
     channel_response = interaction.response
@@ -286,72 +346,71 @@ async def serverinfo(interaction: Interaction,
     try:
         data = request.json()
         location = requests.get(f'http://ip-api.com/json/{data["ip_address"]}').json()
-        print(location)
-        print(data)
-
     except json.JSONDecodeError as e:
         embed.add_field(name="Error",
                         value=f"Something went wrong. Maybe you typed wrong ip or there is an error with the json file. {e}")
         await channel.send(embed=embed)
-    if data["online"] is True and location["status"] == 'success':
-        embed.add_field(name='Status: ', value='Active')
-        embed.add_field(name='Domain: ', value=data["host"])
-        embed.add_field(name='Ip address: ', value=f'{data["ip_address"]}\n({location["country"]},\n{location["city"]})')
-        embed.add_field(name='Server version: ', value=data["version"]["name_clean"])
-        embed.add_field(name='Online: ', value=f'{data["players"]["online"]}/{data["players"]["max"]}')
-        if anticheats is None:
-            embed.add_field(name='Anticheat: ', value='Unable to load anticheats data.')
-        else:
-            anticheat_info = anticheats.get(domain)
-            if anticheat_info and anticheat_info.get("Anticheat") is not None:
-                embed.add_field(name='Anticheat: ', value=anticheat_info["Anticheat"])
+    try:
+        if data["online"] is True and location["status"] == 'success':
+            embed.add_field(name='Status: ', value='Active')
+            embed.add_field(name='Domain: ', value=data["host"])
+            embed.add_field(name='Ip address: ', value=f'{data["ip_address"]}\n({location["country"]},\n{location["city"]})')
+            embed.add_field(name='Server version: ', value=data["version"]["name_clean"])
+            embed.add_field(name='Online: ', value=f'{data["players"]["online"]}/{data["players"]["max"]}')
+            if anticheats is None:
+                embed.add_field(name='Anticheat: ', value='Unable to load anticheats data.')
             else:
-                embed.add_field(name='Anticheat: ', value='Information not found in database')
-        if data["players"]["online"] >= 60:
-            embed.add_field(name='Players list: ', value="Too much players sorry(")
-        else:
-            players_list = [member.get("name_clean", "Unknown") for member in data.get("players", {}).get("list", [])]
-            if players_list:
-                embed.add_field(name='Players list:', value="\n".join(players_list))
+                anticheat_info = anticheats.get(domain)
+                if anticheat_info and anticheat_info.get("Anticheat") is not None:
+                    embed.add_field(name='Anticheat: ', value=anticheat_info["Anticheat"])
+                else:
+                    embed.add_field(name='Anticheat: ', value='Information not found in database')
+            if data["players"]["online"] >= 60:
+                embed.add_field(name='Players list: ', value="Too much players sorry(")
             else:
-                embed.add_field(name='Players list:', value="No players found, or server hid the list")
-        embed.add_field(name="Description: ", value=data["motd"]["clean"])
-        if data["icon"]:
-            print(data["icon"])
-            image_base64 = data["icon"].split(",")[1]
+                players_list = [member.get("name_clean", "Unknown") for member in data.get("players", {}).get("list", [])]
+                if players_list:
+                    embed.add_field(name='Players list:', value="\n".join(players_list))
+                else:
+                    embed.add_field(name='Players list:', value="No players found, or server hid the list")
+            embed.add_field(name="Description: ", value=data["motd"]["clean"])
+            if data["icon"]:
+                image_base64 = data["icon"].split(",")[1]
+                try:
+                    message, emoji_id = await add_emoji(cut_domain(data["host"]), image_base64)
+                    print(message)
+                    await add_server(data, location, emoji_id)
+                except requests.exceptions.RequestException:
+                    print(f'Something went wrong while adding emoji with name: {cut_domain(data["host"])}')
+
+                file_path = await save_icon(image_base64, f"{data['host']}.png")
+                file = nextcord.File(file_path, filename=f"{data['host']}.png")
+                embed.set_thumbnail(url=f"attachment://{data['host']}.png")
+            embed.add_field(name='Requested: ', value=f'<t:{int(data["retrieved_at"] / 1000)}:R>')
+
             try:
-                message, emoji_id = await add_emoji(cut_domain(data["host"]), image_base64)
-                print(message)
-                await add_server(data, location, emoji_id)
-            except requests.exceptions.RequestException:
-                print(f'Something went wrong while adding emoji with name: {cut_domain(data["host"])}')
-
-            file_path = await save_icon(image_base64, f"{data['host']}.png")
-            file = nextcord.File(file_path, filename=f"{data['host']}.png")
-            embed.set_thumbnail(url=f"attachment://{data['host']}.png")
-        embed.add_field(name='Requested: ', value=f'<t:{int(data["retrieved_at"] / 1000)}:R>')
-
-        try:
-            await channel.send(embed=embed, file=file)
-        except nextcord.errors.NotFound:
-            await channel.send(f'Something went wrong, try again please')
-        except UnboundLocalError:
-            await channel.send(embed=embed)
-    elif location["status"] == 'success':
-        print(location)
-        print(data)
-        embed.add_field(name="Status: ", value=f"Currently server offline\n"
-                                               f'Ip: {data["ip_address"]}\n({location["country"]},\n{location["city"]})\n')
-        try:
-            await channel.send(embed=embed)
-        except nextcord.errors.NotFound:
-            await channel.send(f'Something went wrong, try again please')
-    else:
-        embed.add_field(name="Status: ", value="invalid domain wrote")
-        try:
-            await channel.send(embed=embed)
-        except nextcord.errors.NotFound:
-            await channel.send(f'Something went wrong, try again please')
+                await channel.send(embed=embed, file=file)
+            except nextcord.errors.NotFound:
+                await channel.send(f'Something went wrong, try again please')
+            except UnboundLocalError:
+                await channel.send(embed=embed)
+        elif location["status"] == 'success':
+            embed.add_field(name="Status: ", value=f"Currently server offline\n"
+                                                   f'Ip: {data["ip_address"]}\n({location["country"]},\n{location["city"]})\n')
+            try:
+                await channel.send(embed=embed)
+            except nextcord.errors.NotFound:
+                await channel.send(f'Something went wrong, try again please')
+        else:
+            embed.add_field(name="Status: ", value="invalid domain wrote")
+            try:
+                await channel.send(embed=embed)
+            except nextcord.errors.NotFound:
+                await channel.send(f'Something went wrong, try again please')
+    except UnboundLocalError:
+        embed.add_field(name="Error",
+                        value=f"Something went wrong. Maybe you typed wrong ip")
+        await channel.send(embed=embed)
 
 
 @client_discord.slash_command(name='minecraft-server-anticheat', description='You can write server anticheat if you have information')
@@ -361,17 +420,10 @@ async def server_anticheat(interaction: Interaction,
                            new_anticheat: str = SlashOption(name='anticheat',
                                                             description='Please enter new anticheat name')):
     servers = await anticheat_read()
-
     if cut_domain(server) in servers:
         old_anticheat = servers[cut_domain(server)]["Anticheat"]
-        if old_anticheat == 'Not added (to file)':
-            servers[cut_domain(server)]["Anticheat"] = new_anticheat
-            async with aiofiles.open('Servers/Anticheats.json', 'w', encoding='utf-8') as f:
-                await f.write(json.dumps(servers, ensure_ascii=False, indent=4))
-            if servers[cut_domain(server)]["Anticheat"] == new_anticheat:
-                await interaction.response.send_message(f'Successfully. Anticheat of server {server} updated from {old_anticheat} to {new_anticheat}', ephemeral=True)
-            else:
-                await interaction.response.send_message(f'Something went wrong, please try again later', ephemeral=True)
+        if old_anticheat == 'Not added (to file)' or interaction.user.id == support:
+            await change_anticheat(server, servers, new_anticheat, old_anticheat, interaction)
         else:
             await interaction.response.send_message(
                 f'Anticheat already set, if you have another anticheat information please type to <@{support}>',
@@ -385,7 +437,7 @@ async def serverinfo_list(interaction: Interaction):
     channel = interaction.channel
     user = interaction.user
     data = await anticheat_read()
-    print("-" * 1000)
+    print("-" * 30)
     print(f'Requested by {user.name}')
     if data is None:
         return
@@ -395,6 +447,8 @@ async def serverinfo_list(interaction: Interaction):
     chunk_size = 25
     chunks = [servers[i:i + chunk_size] for i in range(0, len(servers), chunk_size)]
     response_time = time.monotonic()
+    servers_count = 0
+    embeds_count = 0
     async with aiohttp.ClientSession() as session:
         for chunk in chunks:
             embed = nextcord.Embed(title='Servers list', color=nextcord.Color.dark_grey())
@@ -403,13 +457,14 @@ async def serverinfo_list(interaction: Interaction):
                 server = data[server_name]
 
                 try:
-                    start_time = time.monotonic()
+                    # start_time = time.monotonic()
                     async with session.get(f'https://api.mcstatus.io/v2/status/java/{server["Domain"].lower()}') as request:
                         data_server = await request.json()
                     async with session.get(f'http://ip-api.com/json/{data_server["ip_address"]}') as request:
                         location = await request.json()
-                    end_time = time.monotonic()
-                    print(f'Response: is server active: {data_server["online"]} ({data_server["host"]}), location: {location["status"]}, Ip: {data_server["ip_address"]}, Elapsed: {end_time-start_time:.2f}s')
+                    # end_time = time.monotonic()
+                    servers_count += 1
+                    # print(f'Response: is server active: {data_server["online"]} ({data_server["host"]}), location: {location["status"]}, Ip: {data_server["ip_address"]}, Elapsed: {end_time-start_time:.2f}s')
                 except Exception as e:
                     print(f'Error: {e}')
                     continue
@@ -453,10 +508,10 @@ async def serverinfo_list(interaction: Interaction):
                     inline=True
                 )
             await channel.send(embed=embed)
-            print(f'Successfully sent embed message!')
+            embeds_count += 1
             await asyncio.sleep(1)
         send_time = time.monotonic()
-        print(f'Takes: {send_time-response_time:.2f}s')
+        print(f'Successfully sent {embeds_count} messages\nTook: {send_time-response_time:.2f}s. Count of servers: {servers_count}')
         await client_discord.change_presence(status=nextcord.Status.online)
 
 
@@ -476,8 +531,6 @@ async def serverinfo(interaction: Interaction,
             players = host.players()
         except Exception:
             await interaction.followup.send(f"Server can't send correct response message!", ephemeral=True)
-        print(info.__dict__)
-        print(players.__dict__)
         player = [f'{player["name"]} {player["score"]} ({player["duration"]/60:.1f} min)' for player in players["players"]]
         embed = nextcord.Embed(title='Information about counter-strike server',
                                color=nextcord.Color.dark_grey())
