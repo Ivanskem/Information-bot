@@ -29,7 +29,7 @@ client_discord = nextcord.Client(intents=intents)
 
 disconnect_count = 0
 
-if not os.path.exists('Temp') and os.path.isdir('Temp'):
+if not os.path.exists('Temp'):
     os.mkdir('Temp')
 
 try:
@@ -38,9 +38,9 @@ try:
 except FileNotFoundError:
     with open('Temp/settings.json', 'w', encoding='utf-8') as file:
         new_json = {}
-        json.dump(new_json, ensure_ascii=False, indent=4)
+        json.dump(new_json, file, ensure_ascii=False, indent=4)
 
-if not os.path.exists('Servers') and os.path.isdir('Servers'):
+if not os.path.exists('Servers'):
     os.mkdir('Servers')
 
 try:
@@ -49,7 +49,7 @@ try:
 except FileNotFoundError:
     with open('Servers/Anticheats.json', 'w', encoding='utf-8') as file:
         new_json = {}
-        json.dump(new_json, ensure_ascii=False, indent=4)
+        json.dump(new_json, file, ensure_ascii=False, indent=4)
 
 try:
     with open('Servers/Location.json', 'r', encoding='utf-8') as file:
@@ -57,12 +57,12 @@ try:
 except FileNotFoundError:
     with open('Servers/Location.json', 'w', encoding='utf-8') as file:
         new_json = {}
-        json.dump(new_json, ensure_ascii=False, indent=4)
+        json.dump(new_json, file, ensure_ascii=False, indent=4)
 
-if not os.path.exists('images') and os.path.isdir('images'):
+if not os.path.exists('images'):
     os.mkdir('images')
 
-if not os.path.exists('icons') and os.path.isdir('icons'):
+if not os.path.exists('icons'):
     os.mkdir('icons')
 
 try:
@@ -78,7 +78,8 @@ except FileNotFoundError:
     with open('settings.json', 'w') as file:
         settings = {
             "TOKEN": "Enter your discord bot token",
-            "WHOIS": "Enter you WHOIS api key"
+            "WHOIS": "Enter you WHOIS api key",
+            "Support": "Entere you're support discord id"
         }
         json.dump(settings, file, indent=4)
 
