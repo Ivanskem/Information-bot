@@ -359,7 +359,7 @@
     "og-network": {
         "Title": "og-network",
         "Domain": "og-network.net",
-        "Anticheat": "Not added (to file)",
+        "Anticheat": "Grim",
         "Emoji": "<:customemoji:1279029985595756606>",
         "Location": "France"
     },
@@ -411,5 +411,26 @@
         "Anticheat": "Not added (to file)",
         "Emoji": "<:customemoji:1279458500845506560>",
         "Location": "Bulgaria"
+    },
+    "mysurvivallife": {
+        "Title": "mysurvivallife",
+        "Domain": "play.mysurvivallife.com",
+        "Anticheat": "Not added (to file)",
+        "Emoji": "<:customemoji:1279808608074203278>",
+        "Location": "Barbados"
+    },
+    "hypixel": {
+        "Title": "hypixel",
+        "Domain": "hypixel.net",
+        "Anticheat": "Watchdog + UNCP",
+        "Emoji": "<:customemoji:1277155018666938480>",
+        "Location": "Canada"
+    },
+    "anticheat-test": {
+        "Title": "anticheat-test",
+        "Domain": "anticheat-test.com",
+        "Anticheat": "This is server for test popular anticheat (Vulcan, Matrix, Verus, UNCP, UNCP, OLDNCP, Grim, Negativity, Karhu)",
+        "Emoji": "<:customemoji:1282639195709378593>",
+        "Location": "United States"
     }
 }
